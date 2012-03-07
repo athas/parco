@@ -33,9 +33,11 @@ data Assoc = AssocNone
            | AssocLeft
            | AssocRight
 
--- | This data type specifies operators that work on values of type @a@.
--- An operator is either binary infix or unary prefix or postfix. A
--- binary operator has also an associated associativity.
+-- | This data type specifies operators that work on values of type
+-- @a@.  An operator is either binary infix or unary prefix or
+-- postfix. A binary operator has also an associated associativity.
+-- Special constructors are used to designate unary constructors that
+-- still have associativity.
 data Operator p a = Infix (p (a -> a -> a)) Assoc
                   | Prefix (p (a -> a))
                   | Postfix (p (a -> a))
