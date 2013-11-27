@@ -3,7 +3,7 @@
 -- | 'Text.Parco.Parser' instances for
 -- 'Data.Attoparsec.ByteString.Parser' and
 -- 'Data.Attoparsec.Text.Parser'
-module Text.Parco.Parsec() where
+module Text.Parco.Attoparsec() where
 
 import qualified Text.Parco
 import qualified Data.Attoparsec.ByteString
