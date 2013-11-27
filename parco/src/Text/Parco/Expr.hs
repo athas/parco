@@ -1,18 +1,21 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.Parco.Expr
--- Copyright   :  (c) Daan Leijen 1999-2001, (c) Paolo Martini 2007, (c) Troels Henriksen 2012
+-- Copyright   :  (c) Daan Leijen 1999-2001, (c) Paolo Martini 2007, (c) Troels Henriksen 2012-2013
 -- License     :  BSD-style (see the LICENSE file)
--- 
+--
 -- Maintainer  :  athas@sigkill.dk
 -- Stability   :  stable
 -- Portability :  portable
--- 
+--
 -- This module implements permutation parsers, and is a generalisation
 -- of 'Text.Parsec.Expr' that will work with any parser combinator
 -- library. It builds a parser given a table of operators and
 -- associativities.
--- 
+--
+-- This module is a drop-in replacement for 'Text.Parsec.Expr', and
+-- the implementation is taken from that module.
+--
 -----------------------------------------------------------------------------
 
 module Text.Parco.Expr
@@ -27,7 +30,7 @@ import Text.Parco
 -- Assoc and OperatorTable
 -----------------------------------------------------------
 
--- |  This data type specifies the associativity of operators: left, right
+-- | This data type specifies the associativity of operators: left, right
 -- or none.
 data Assoc = AssocNone
            | AssocLeft
@@ -36,13 +39,16 @@ data Assoc = AssocNone
 -- | This data type specifies operators that work on values of type
 -- @a@.  An operator is either binary infix or unary prefix or
 -- postfix. A binary operator has also an associated associativity.
--- Special constructors are used to designate unary constructors that
--- still have associativity.
+-- As in Parsec, 'Infix' and 'Prefix' operators cannot be directly
+-- nested - i.e, in an expression grammar, if @-@ is a prefix
+-- operator, @- -x@ would be a parse error, although @-(-x)@ would
+-- work.  Use 'PrefixNestable'/'PostfixNestable' if you want fully
+-- nestable unary operators.
 data Operator p a = Infix (p (a -> a -> a)) Assoc
                   | Prefix (p (a -> a))
                   | Postfix (p (a -> a))
-                  | PrefixAssoc (p (a -> a))
-                  | PostfixAssoc (p (a -> a))
+                  | PrefixNestable (p (a -> a))
+                  | PostfixNestable (p (a -> a))
 
 -- | An @OperatorTable p a@ is a list of @Operator p a@
 -- lists. The list is ordered in descending
@@ -80,7 +86,7 @@ type OperatorTable p a = [[Operator p a]]
 -- >            , [binary "*" (*) AssocLeft, binary "/" (div) AssocLeft ]
 -- >            , [binary "+" (+) AssocLeft, binary "-" (-)   AssocLeft ]
 -- >            ]
--- >          
+-- >
 -- >  binary  name fun assoc = Infix (do{ reservedOp name; return fun }) assoc
 -- >  prefix  name fun       = Prefix (do{ reservedOp name; return fun })
 -- >  postfix name fun       = Postfix (do{ reservedOp name; return fun })
@@ -132,7 +138,7 @@ buildExpressionParser operators simpleExpr =
           rassocP1 x = rassocP x <|> return x
 
           lassocP x  = do f <- lassocOp
-                          y <- termP
+                          y <- termP <|> buildExpressionParser operators simpleExpr
                           lassocP1 (f x y)
                        <|> ambiguousRight
                        <|> ambiguousNon
@@ -161,10 +167,10 @@ buildExpressionParser operators simpleExpr =
     splitOp (Postfix op) (rassoc,lassoc,nassoc,nprefix,npostfix,prefix,postfix) =
       (rassoc,lassoc,nassoc,nprefix,op:npostfix,prefix,postfix)
 
-    splitOp (PrefixAssoc op) (rassoc,lassoc,nassoc,nprefix,npostfix,prefix,postfix) =
+    splitOp (PrefixNestable op) (rassoc,lassoc,nassoc,nprefix,npostfix,prefix,postfix) =
       (rassoc,lassoc,nassoc,nprefix,npostfix,op:prefix,postfix)
 
-    splitOp (PostfixAssoc op) (rassoc,lassoc,nassoc,nprefix,npostfix,prefix,postfix) =
+    splitOp (PostfixNestable op) (rassoc,lassoc,nassoc,nprefix,npostfix,prefix,postfix) =
       (rassoc,lassoc,nassoc,nprefix,npostfix,prefix,op:postfix)
 
 -- | Pick the first one that works.

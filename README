@@ -1,0 +1,8 @@
+Parco - general parser combinators for Haskell
+---
+
+This library provides general parser combinators that can be used with
+multiple different underlying parser implementations, for example
+Parsec or Attoparsec.
+
+The current contents are merely retrofitted Parsec modules.
