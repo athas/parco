@@ -5,4 +5,8 @@ This library provides general parser combinators that can be used with
 multiple different underlying parser implementations, for example
 Parsec or Attoparsec.
 
-The current contents are merely retrofitted Parsec modules.
+This repository contains several packages that are developed in sync -
+the main `parco` package, as well as interfaces to different concrete
+parser implementations.  This division is to ensure that `parco`
+itself does not depend on parser implementations that the user is not
+interested in.
