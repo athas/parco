@@ -77,7 +77,7 @@ type OperatorTable p a = [[Operator p a]]
 -- >  expr    = buildExpressionParser table term
 -- >          <?> "expression"
 -- >
--- >  term    =  parens expr 
+-- >  term    =  parens expr
 -- >          <|> natural
 -- >          <?> "simple expression"
 -- >
@@ -87,9 +87,9 @@ type OperatorTable p a = [[Operator p a]]
 -- >            , [binary "+" (+) AssocLeft, binary "-" (-)   AssocLeft ]
 -- >            ]
 -- >
--- >  binary  name fun assoc = Infix (do{ reservedOp name; return fun }) assoc
--- >  prefix  name fun       = Prefix (do{ reservedOp name; return fun })
--- >  postfix name fun       = Postfix (do{ reservedOp name; return fun })
+-- >  binary  name fun assoc = Infix   (reservedOp name >> return fun) assoc
+-- >  prefix  name fun       = Prefix  (reservedOp name >> return fun)
+-- >  postfix name fun       = Postfix (reservedOp name >> return fun)
 buildExpressionParser :: (Monad p, Parser p) => OperatorTable p a
                       -> p a
                       -> p a

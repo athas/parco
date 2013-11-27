@@ -3,18 +3,18 @@
 -- Module      :  Text.ParserCombinators.Perm
 -- Copyright   :  (c) Daan Leijen 1999-2001, (c) Paolo Martini 2007, (c) Troels Henriksen 2011-2012
 -- License     :  BSD-style (see the file LICENSE)
--- 
+--
 -- Maintainer  :  athas@sigkill.dk
 -- Stability   :  stable
 -- Portability :  non-portable (uses existentially quantified data constructors)
--- 
+--
 -- This module implements permutation parsers, and is a generalisation
 -- of 'Text.Parsec.Perm' that will work with any parser combinator
 -- library.  The algorithm is described in:
--- 
+--
 -- /Parsing Permutation Phrases,/
 -- by Arthur Baars, Andres Loh and Doaitse Swierstra.
--- 
+--
 -----------------------------------------------------------------------------
 
 {-# LANGUAGE ExistentialQuantification #-}
@@ -56,7 +56,7 @@ ptest
 -- | The expression @perm \<||> p@ adds parser @p@ to the permutation
 -- parser @perm@. The parser @p@ is not allowed to accept empty input -
 -- use the optional combinator ('<|?>') instead. Returns a
--- new permutation parser that includes @p@. 
+-- new permutation parser that includes @p@.
 
 (<||>) :: PermParser p (a -> b) -> p a -> PermParser p b
 perm <||> p = add perm p
@@ -81,7 +81,7 @@ f <$$> p = newperm f <||> p
 -- | The expression @perm \<||> (x,p)@ adds parser @p@ to the
 -- permutation parser @perm@. The parser @p@ is optional - if it can
 -- not be applied, the default value @x@ will be used instead. Returns
--- a new permutation parser that includes the optional parser @p@. 
+-- a new permutation parser that includes the optional parser @p@.
 (<|?>) :: PermParser p (a -> b) -> (a, p a) -> PermParser p b
 perm <|?> (x,p) = addopt perm x p
 
@@ -89,7 +89,7 @@ perm <|?> (x,p) = addopt perm x p
 -- consisting of parser @p@. The the final result of the permutation
 -- parser is the function @f@ applied to the return value of @p@. The
 -- parser @p@ is optional - if it can not be applied, the default value
--- @x@ will be used instead. 
+-- @x@ will be used instead.
 (<$?>) :: (a -> b) -> (a, p a) -> PermParser p b
 f <$?> (x,p) = newperm f <|?> (x,p)
 
@@ -98,7 +98,7 @@ f <$?> (x,p) = newperm f <|?> (x,p)
 ---------------------------------------------------------------}
 
 -- | The type @PermParser p a@ denotes a permutation parser that,
--- when converted by the 'permute' function, parses 
+-- when converted by the 'permute' function, parses
 -- @s@ streams with user state @st@ and returns a value of
 -- type @a@ on success.
 --
